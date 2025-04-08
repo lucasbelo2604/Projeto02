@@ -27,20 +27,20 @@ int main() {
                 consultar_saldo();
                 sair = voltar();
             } else if (strcmp(opcao, "2") == 0) {
-                consultar_extrato();
+           
                 sair = voltar();
             } else if (strcmp(opcao, "3") == 0) {
                 depositar();
                 sair = voltar();
             } else if (strcmp(opcao, "4") == 0) {
-                sacar();
-                sair = voltar();
-            // } else if (strcmp(opcao, "5") == 0) {
-            //     comprar_cripto();
-            //     sair = voltar();
-            // } else if (strcmp(opcao, "6") == 0) {
-            //     vender_cripto();
-            //     sair = voltar();
+                 sacar();
+                 sair = voltar();
+             } else if (strcmp(opcao, "5") == 0) {
+                 comprar_cripto();
+                 sair = voltar();
+             } else if (strcmp(opcao, "6") == 0) {
+                 vender_cripto();
+                 sair = voltar();
             // } else if (strcmp(opcao, "7") == 0) {
             //     atualizar_cot();
                 // sair = voltar();

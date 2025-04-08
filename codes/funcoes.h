@@ -42,9 +42,9 @@ void consultar_saldo();
 void consultar_extrato();
 void depositar();
 void sacar();
-// void comprar_cripto();
-// void vender_cripto();
-// void atualizar_cot();
+void comprar_cripto(); 
+void vender_cripto();
+void atualizar_cot();
 void menu();
 bool voltar();
 

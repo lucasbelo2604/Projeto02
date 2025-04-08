@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+#include <ctype.h>
 
 // Variáveis globais (serão movidas para o arquivo principal posteriormente)
 char nome[50] = "Luis, Lucas e Leo";
@@ -15,6 +16,7 @@ float saldo_ripple = 0;
 float cotacao_bit = 416328.72;
 float cotacao_ethe = 15201.58;
 float cotacao_ripple = 2.99;
+
 
 void consultar_saldo() {
     int senha_usuario;
@@ -64,11 +66,135 @@ void sacar() {
     }
 }
 
+void comprar_cripto() {
+    int senha_usuario;
+    printf("Por favor, informe a sua senha: ");
+    scanf("%d", &senha_usuario);
+    
+    if (senha_usuario == senha) {
+        printf("\nCotação Bitcoin: R$%.2f\n", cotacao_bit);
+        printf("Cotação Ethereum: R$%.2f\n", cotacao_ethe);
+        printf("Cotação Ripple: R$%.2f\n", cotacao_ripple);
+        
+        char escolha[20];
+        float compra;
+        
+        printf("\nQual criptomoeda deseja comprar (Bitcoin/Ethereum/Ripple): ");
+        scanf("%s", escolha);
+        
+        // Normaliza a entrada para minúsculas
+        for (int i = 0; escolha[i]; i++) {
+            escolha[i] = tolower(escolha[i]);
+        }
+        
+        printf("Quanto deseja comprar em R$? ");
+        scanf("%f", &compra);
+        
+        if (compra > saldo_real) {
+            printf("Seu saldo em real é insuficiente!\n");
+            return;
+        }
+        
+        if (strcmp(escolha, "bitcoin") == 0) {
+            float quantidade = compra / cotacao_bit;
+            saldo_real -= compra;
+            saldo_bitcoin += quantidade * 0.98; // Taxa de 2%
+            printf("Compra realizada! Você adquiriu %.6f BTC\n", quantidade * 0.98);
+        }
+        else if (strcmp(escolha, "ethereum") == 0) {
+            float quantidade = compra / cotacao_ethe;
+            saldo_real -= compra;
+            saldo_ethe += quantidade * 0.99; // Taxa de 1%
+            printf("Compra realizada! Você adquiriu %.4f ETH\n", quantidade * 0.99);
+        }
+        else if (strcmp(escolha, "ripple") == 0) {
+            float quantidade = compra / cotacao_ripple;
+            saldo_real -= compra;
+            saldo_ripple += quantidade * 0.99; // Taxa de 1%
+            printf("Compra realizada! Você adquiriu %.2f XRP\n", quantidade * 0.99);
+        }
+        else {
+            printf("Criptomoeda inválida!\n");
+        }
+        
+        printf("(Registro no extrato será implementado depois)\n");
+    } else {
+        printf("Senha inválida!\n");
+    }
+}
+
+void vender_cripto() {
+    int senha_usuario;
+    printf("Por favor, informe a sua senha: ");
+    scanf("%d", &senha_usuario);
+    
+    if (senha_usuario == senha) {
+        printf("\nCotação Bitcoin: R$%.2f\n", cotacao_bit);
+        printf("Cotação Ethereum: R$%.2f\n", cotacao_ethe);
+        printf("Cotação Ripple: R$%.2f\n", cotacao_ripple);
+        
+        char escolha[20];
+        float venda;
+        
+        printf("\nQual criptomoeda deseja vender (Bitcoin/Ethereum/Ripple): ");
+        scanf("%s", escolha);
+        
+        for (int i = 0; escolha[i]; i++) {
+            escolha[i] = tolower(escolha[i]);
+        }
+        
+        printf("Quanto deseja vender? ");
+        scanf("%f", &venda);
+        
+        if (strcmp(escolha, "bitcoin") == 0) {
+            if (venda > saldo_bitcoin) {
+                printf("Saldo insuficiente de Bitcoin!\n");
+                return;
+            }
+            float valor_recebido = venda * cotacao_bit * 0.97; // Taxa de 3%
+            saldo_bitcoin -= venda;
+            saldo_real += valor_recebido;
+            printf("Venda realizada! Você recebeu R$%.2f\n", valor_recebido);
+        }
+        else if (strcmp(escolha, "ethereum") == 0) {
+            if (venda > saldo_ethe) {
+                printf("Saldo insuficiente de Ethereum!\n");
+                return;
+            }
+            float valor_recebido = venda * cotacao_ethe * 0.98; // Taxa de 2%
+            saldo_ethe -= venda;
+            saldo_real += valor_recebido;
+            printf("Venda realizada! Você recebeu R$%.2f\n", valor_recebido);
+        }
+        else if (strcmp(escolha, "ripple") == 0) {
+            if (venda > saldo_ripple) {
+                printf("Saldo insuficiente de Ripple!\n");
+                return;
+            }
+            float valor_recebido = venda * cotacao_ripple * 0.99; // Taxa de 1%
+            saldo_ripple -= venda;
+            saldo_real += valor_recebido;
+            printf("Venda realizada! Você recebeu R$%.2f\n", valor_recebido);
+        }
+        else {
+            printf("Criptomoeda inválida!\n");
+        }
+        
+        printf("(Registro no extrato será implementado depois)\n");
+    } else {
+        printf("Senha inválida!\n");
+    }
+}
+
+
+
 void menu() {
     printf("\n1. Consulta do Saldo\n");
     printf("2. Consulta de Extrato\n");
     printf("3. Depositar\n");
     printf("4. Sacar\n");
+    printf("5. Comprar Criptomoedas\n");
+    printf("6. Vender Criptomoedas\n");
     printf("0. Sair\n");
 }
 
