@@ -28,11 +28,10 @@ void obter_data_hora_atual(char *data_hora) {
              tm.tm_hour, tm.tm_min);
 }
 
-// Implementação das funções
 void ler_arquivo() {
     FILE *arquivo = fopen("dados.txt", "r");
     if (arquivo == NULL) {
-        // Se o arquivo não existe, cria um novo com valores iniciais
+      
         FILE *novo_arquivo = fopen("dados.txt", "w");
         if (novo_arquivo == NULL) {
             printf("Erro ao criar arquivo de dados!\n");
@@ -55,7 +54,6 @@ void ler_arquivo() {
     bool lendo_extrato = false;
 
     while (fgets(linha, MAX_LINHA, arquivo) != NULL) {
-        // Remove a quebra de linha do final
         linha[strcspn(linha, "\n")] = 0;
         
         if (!lendo_extrato) {
@@ -79,12 +77,10 @@ void ler_arquivo() {
         } else {
             if (num_transacoes < MAX_EXTRATO && strlen(linha) > 0) {
                 Transacao t;
-                // Formato ajustado para corresponder exatamente ao formato de gravação
                 if (sscanf(linha, "%10s %5s %1s %f %3s CT: %f TX: %f REAL: %f BTC: %f ETH: %f XRP: %f",
                           t.data_hora, t.data_hora+11, t.sinal, &t.valor, t.moeda, 
                           &t.cotacao, &t.taxa, &t.saldo_real, &t.saldo_bitcoin, 
                           &t.saldo_ethe, &t.saldo_ripple) >= 7) {
-                    // Recompõe a data/hora completa
                     sprintf(t.data_hora, "%s %s", t.data_hora, t.data_hora+11);
                     extrato[num_transacoes++] = t;
                 }
