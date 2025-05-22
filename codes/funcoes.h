@@ -9,6 +9,8 @@
 
 #define MAX_EXTRATO 100
 #define MAX_LINHA 256
+#define MAX_USUARIOS 100
+#define MAX_CRIPTOS 100
 
 typedef struct {
     char data_hora[50];
@@ -22,6 +24,23 @@ typedef struct {
     float saldo_ethe;
     float saldo_ripple;
 } Transacao;
+
+typedef struct {
+    char nome[50];
+    char cpf[15];
+    int senha;
+    float saldo_real;
+    float saldo_bitcoin;
+    float saldo_ethe;
+    float saldo_ripple;
+} Investidor;
+
+typedef struct {
+    char nome[30];
+    float cotacao;
+    float taxa_compra;
+    float taxa_venda;
+} Criptomoeda;
 
 extern char nome[50];
 extern char cpf[15];
@@ -48,5 +67,13 @@ void vender_cripto();
 void atualizar_cot();
 void menu();
 bool voltar();
+
+void menu_administrador();
+void cadastrar_investidor();
+void excluir_investidor();
+void cadastrar_cripto();
+void excluir_cripto();
+void consultar_saldo_investidor();
+void consultar_extrato_investidor();
 
 #endif

@@ -559,3 +559,15 @@ bool voltar() {
     }
     return false;
 }
+void menu_administrador() {
+    printf("\n=== Menu Administrador ===\n");
+    printf("1. Cadastrar Investidor\n");
+    printf("2. Excluir Investidor\n");
+    printf("3. Cadastrar Criptomoeda\n");
+    printf("4. Excluir Criptomoeda\n");
+    printf("5. Consultar Saldo de Investidor\n");
+    printf("6. Consultar Extrato de Investidor\n");
+    printf("7. Atualizar Cotação de Criptomoedas\n");
+    printf("0. Sair\n");
+    printf("==========================\n");
+}
