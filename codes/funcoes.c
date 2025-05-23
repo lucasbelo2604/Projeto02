@@ -559,6 +559,40 @@ bool voltar() {
     }
     return false;
 }
+
+void cadastrar_investidor() {
+    char nome[50], cpf[15];
+    int senha;
+    printf("Nome do investidor: ");
+    scanf(" %[^\n]", nome);
+    printf("CPF: ");
+    scanf("%s", cpf);
+    printf("Senha: ");
+    scanf("%d", &senha);
+    printf("Investidor %s com CPF %s cadastrado com sucesso!\n", nome, cpf);
+}
+
+void excluir_investidor() {
+    char cpf[15];
+    printf("CPF do investidor a ser excluído: ");
+    scanf("%s", cpf);
+    printf("Investidor com CPF %s excluído com sucesso!\n", cpf);
+}
+
+void consultar_saldo_investidor() {
+    char cpf[15];
+    printf("Informe o CPF do investidor: ");
+    scanf("%s", cpf);
+    printf("Saldo do investidor %s consultado (simulado).\n", cpf);
+}
+
+void consultar_extrato_investidor() {
+    char cpf[15];
+    printf("Informe o CPF do investidor: ");
+    scanf("%s", cpf);
+    printf("Extrato do investidor %s consultado (simulado).\n", cpf);
+}
+
 void menu_administrador() {
     printf("\n=== Menu Administrador ===\n");
     printf("1. Cadastrar Investidor\n");

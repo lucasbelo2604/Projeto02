@@ -1,12 +1,9 @@
-Saldo em Real: 39191.95
-Saldo em Bitcoin: 0.020617
+Saldo em Real: 0.00
+Saldo em Bitcoin: 0.000000
 Saldo em Ethereum: 0.0000
 Saldo em Ripple: 0.00
-Cotação Bitcoin: R$432981.88
-Cotação Ethereum: R$15961.66
-Cotação Ripple: R$2.84
+Cotação Bitcoin: R$416328.72
+Cotação Ethereum: R$15201.58
+Cotação Ripple: R$2.99
 
 Extrato de Transações:
-10-04-2025 13:59 + 0.07 BTC CT: 416328.72 TX: 0.02 REAL: 19000.00 BTC: 0.070617 ETH: 0.0000 XRP: 0.00
-10-04-2025 13:59 - 0.05 BTC CT: 416328.72 TX: 0.03 REAL: 39191.95 BTC: 0.020617 ETH: 0.0000 XRP: 0.00
-10-04-2025 14:00 C 0.00 EXT CT: 0.00 TX: 0.00 REAL: 39191.95 BTC: 0.020617 ETH: 0.0000 XRP: 0.00
