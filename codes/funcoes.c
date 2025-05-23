@@ -1,607 +1,155 @@
-#include "funcoes.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <stdbool.h>
-#include <ctype.h>
+#include "funcoes.h"
 
-// Variáveis globais
-char nome[50] = "Luis";
-char cpf[15] = "12345678910";
-int senha = 999999;
-float saldo_real = 0;
-float saldo_bitcoin = 0;
-float saldo_ethe = 0;
-float saldo_ripple = 0;
-float cotacao_bit = 416328.72;
-float cotacao_ethe = 15201.58;
-float cotacao_ripple = 2.99;
-Transacao extrato[MAX_EXTRATO];
-int num_transacoes = 0;
+// Simulação de base de dados
+#define MAX_INV 100
+#define MAX_CRIPTOS 10
 
-void obter_data_hora_atual(char *data_hora) {
-    time_t t = time(NULL);
-    struct tm tm = *localtime(&t);
-    snprintf(data_hora, 20, "%02d-%02d-%04d %02d:%02d", 
-             tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900, 
-             tm.tm_hour, tm.tm_min);
-}
+Investidor investidores[MAX_INV];
+int totalInvestidores = 0;
 
-void ler_arquivo() {
-    FILE *arquivo = fopen("dados.txt", "r");
-    if (arquivo == NULL) {
-      
-        FILE *novo_arquivo = fopen("dados.txt", "w");
-        if (novo_arquivo == NULL) {
-            printf("Erro ao criar arquivo de dados!\n");
-            return;
-        }
-        
-        fprintf(novo_arquivo, "Saldo em Real: %.2f\n", saldo_real);
-        fprintf(novo_arquivo, "Saldo em Bitcoin: %.6f\n", saldo_bitcoin);
-        fprintf(novo_arquivo, "Saldo em Ethereum: %.4f\n", saldo_ethe);
-        fprintf(novo_arquivo, "Saldo em Ripple: %.2f\n", saldo_ripple);
-        fprintf(novo_arquivo, "Cotação Bitcoin: R$%.2f\n", cotacao_bit);
-        fprintf(novo_arquivo, "Cotação Ethereum: R$%.2f\n", cotacao_ethe);
-        fprintf(novo_arquivo, "Cotação Ripple: R$%.2f\n", cotacao_ripple);
-        fprintf(novo_arquivo, "\nExtrato de Transações:\n");
-        fclose(novo_arquivo);
-        return;
-    }
+Criptomoeda criptos[MAX_CRIPTOS] = {
+    {"Bitcoin", 300000.0, 0.02, 0.015},
+    {"Ethereum", 20000.0, 0.015, 0.012},
+    {"Ripple", 1.50, 0.01, 0.008}
+};
+int totalCriptos = 3;
 
-    char linha[MAX_LINHA];
-    bool lendo_extrato = false;
-
-    while (fgets(linha, MAX_LINHA, arquivo) != NULL) {
-        linha[strcspn(linha, "\n")] = 0;
-        
-        if (!lendo_extrato) {
-            if (strstr(linha, "Saldo em Real:") != NULL) {
-                sscanf(linha, "Saldo em Real: %f", &saldo_real);
-            } else if (strstr(linha, "Saldo em Bitcoin:") != NULL) {
-                sscanf(linha, "Saldo em Bitcoin: %f", &saldo_bitcoin);
-            } else if (strstr(linha, "Saldo em Ethereum:") != NULL) {
-                sscanf(linha, "Saldo em Ethereum: %f", &saldo_ethe);
-            } else if (strstr(linha, "Saldo em Ripple:") != NULL) {
-                sscanf(linha, "Saldo em Ripple: %f", &saldo_ripple);
-            } else if (strstr(linha, "Cotação Bitcoin:") != NULL) {
-                sscanf(linha, "Cotação Bitcoin: R$%f", &cotacao_bit);
-            } else if (strstr(linha, "Cotação Ethereum:") != NULL) {
-                sscanf(linha, "Cotação Ethereum: R$%f", &cotacao_ethe);
-            } else if (strstr(linha, "Cotação Ripple:") != NULL) {
-                sscanf(linha, "Cotação Ripple: R$%f", &cotacao_ripple);
-            } else if (strstr(linha, "Extrato de Transações:") != NULL) {
-                lendo_extrato = true;
-            }
-        } else {
-            if (num_transacoes < MAX_EXTRATO && strlen(linha) > 0) {
-                Transacao t;
-                if (sscanf(linha, "%10s %5s %1s %f %3s CT: %f TX: %f REAL: %f BTC: %f ETH: %f XRP: %f",
-                          t.data_hora, t.data_hora+11, t.sinal, &t.valor, t.moeda, 
-                          &t.cotacao, &t.taxa, &t.saldo_real, &t.saldo_bitcoin, 
-                          &t.saldo_ethe, &t.saldo_ripple) >= 7) {
-                    sprintf(t.data_hora, "%s %s", t.data_hora, t.data_hora+11);
-                    extrato[num_transacoes++] = t;
-                }
-            }
+// Funções de login
+int loginInvestidor(char *cpf, char *senha) {
+    FILE *arq = fopen("investidores.txt", "r");
+    Investidor temp;
+    while (fread(&temp, sizeof(Investidor), 1, arq)) {
+        if (strcmp(temp.cpf, cpf) == 0 && strcmp(temp.senha, senha) == 0) {
+            fclose(arq);
+            return 1;
         }
     }
-    fclose(arquivo);
+    fclose(arq);
+    return 0;
 }
 
-void gravar_dados() {
-    FILE *arquivo = fopen("dados.txt", "w");
-    if (arquivo == NULL) {
-        printf("Erro ao criar arquivo de dados!\n");
-        return;
-    }
-
-    fprintf(arquivo, "Saldo em Real: %.2f\n", saldo_real);
-    fprintf(arquivo, "Saldo em Bitcoin: %.6f\n", saldo_bitcoin);
-    fprintf(arquivo, "Saldo em Ethereum: %.4f\n", saldo_ethe);
-    fprintf(arquivo, "Saldo em Ripple: %.2f\n", saldo_ripple);
-    fprintf(arquivo, "Cotação Bitcoin: R$%.2f\n", cotacao_bit);
-    fprintf(arquivo, "Cotação Ethereum: R$%.2f\n", cotacao_ethe);
-    fprintf(arquivo, "Cotação Ripple: R$%.2f\n", cotacao_ripple);
-    fprintf(arquivo, "\nExtrato de Transações:\n");
-    
-    for (int i = 0; i < num_transacoes; i++) {
-        Transacao t = extrato[i];
-        fprintf(arquivo, "%s %s %.2f %s CT: %.2f TX: %.2f REAL: %.2f BTC: %.6f ETH: %.4f XRP: %.2f\n",
-                t.data_hora, t.sinal, t.valor, t.moeda, t.cotacao, t.taxa,
-                t.saldo_real, t.saldo_bitcoin, t.saldo_ethe, t.saldo_ripple);
-    }
-    fclose(arquivo);
+int loginAdmin(char *cpf, char *senha) {
+    return strcmp(cpf, "admin") == 0 && strcmp(senha, "admin123");
 }
 
-void consultar_saldo() {
-    int senha_usuario;
-    printf("Por favor, informe a sua senha: ");
-    scanf("%d", &senha_usuario);
-    
-    if (senha_usuario == senha) {
-        printf("\nNome: %s\n", nome);
-        printf("CPF: 123.456.789-10\n\n");
-        printf("Saldo em Real: R$%.2f\n", saldo_real);
-        printf("Saldo em Bitcoin: %.6f BTC (R$%.2f)\n", saldo_bitcoin, saldo_bitcoin * cotacao_bit);
-        printf("Saldo em Ethereum: %.4f ETH (R$%.2f)\n", saldo_ethe, saldo_ethe * cotacao_ethe);
-        printf("Saldo em Ripple: %.2f XRP (R$%.2f)\n", saldo_ripple, saldo_ripple * cotacao_ripple);
-        printf("Saldo Total: R$%.2f\n", saldo_real + (saldo_bitcoin * cotacao_bit) + 
-              (saldo_ethe * cotacao_ethe) + (saldo_ripple * cotacao_ripple));
-    } else {
-        printf("Senha inválida!\n");
-    }
-}
+// Menus
+void menuInvestidor(char *cpf) {
+    int op;
+    do {
+        printf("\n--- MENU INVESTIDOR ---\n");
+        printf("1. Consultar Saldo\n");
+        printf("2. Consultar Extrato\n");
+        printf("3. Depositar\n");
+        printf("4. Sacar\n");
+        printf("5. Comprar Criptomoeda\n");
+        printf("6. Vender Criptomoeda\n");
+        printf("7. Atualizar Cotações\n");
+        printf("0. Sair\n");
+        printf("Escolha: ");
+        scanf("%d", &op);
+        getchar();
 
-void consultar_extrato() {
-    int senha_usuario;
-    printf("Por favor, informe a sua senha: ");
-    scanf("%d", &senha_usuario);
-    
-    if (senha_usuario != senha) {
-        printf("Senha inválida!\n");
-        return;
-    }
-
-    char data_hora[20];
-    obter_data_hora_atual(data_hora);
-    
-    if (num_transacoes < MAX_EXTRATO) {
-        Transacao t;
-        strcpy(t.data_hora, data_hora);
-        strcpy(t.sinal, "C");
-        strcpy(t.moeda, "EXT");
-        t.valor = 0.0;
-        t.cotacao = 0.0;
-        t.taxa = 0.0;
-        t.saldo_real = saldo_real;
-        t.saldo_bitcoin = saldo_bitcoin;
-        t.saldo_ethe = saldo_ethe;
-        t.saldo_ripple = saldo_ripple;
-        
-        extrato[num_transacoes++] = t;
-        gravar_dados(); 
-    }
-
-    printf("\n=== Extrato de Transações ===\n");
-    printf("Cliente: %s\n", nome);
-    printf("CPF: 123.456.789-10\n\n");
-    
-    if (num_transacoes == 0) {
-        printf("Nenhuma transação registrada.\n");
-        return;
-    }
-
-    for (int i = 0; i < num_transacoes; i++) {
-        Transacao t = extrato[i];
-        printf("[%s] %s %s %.2f (Cotação: R$%.2f, Taxa: %.0f%%)\n", 
-               t.data_hora, t.sinal, t.moeda, t.valor, t.cotacao, t.taxa * 100);
-        printf("   Saldos: R$%.2f | BTC: %.6f | ETH: %.4f | XRP: %.2f\n\n",
-               t.saldo_real, t.saldo_bitcoin, t.saldo_ethe, t.saldo_ripple);
-    }
-}
-
-void depositar() {
-    char data_hora[20];
-    float valor;
-    
-    obter_data_hora_atual(data_hora);
-    printf("Valor do depósito: R$");
-    scanf("%f", &valor);
-    
-    if (valor <= 0) {
-        printf("Valor inválido!\n");
-        return;
-    }
-
-    saldo_real += valor;
-    
-    if (num_transacoes < MAX_EXTRATO) {
-        Transacao t;
-        strcpy(t.data_hora, data_hora);
-        strcpy(t.sinal, "+");
-        strcpy(t.moeda, "REAL");
-        t.valor = valor;
-        t.cotacao = 1.0;
-        t.taxa = 0.0;
-        t.saldo_real = saldo_real;
-        t.saldo_bitcoin = saldo_bitcoin;
-        t.saldo_ethe = saldo_ethe;
-        t.saldo_ripple = saldo_ripple;
-        
-        extrato[num_transacoes++] = t;
-    }
-    
-    printf("Depósito realizado! Novo saldo: R$%.2f\n", saldo_real);
-    gravar_dados();
-}
-
-void sacar() {
-    char data_hora[20];
-    float valor;
-    
-    obter_data_hora_atual(data_hora);
-    printf("Valor do saque: R$");
-    scanf("%f", &valor);
-    
-    if (valor <= 0) {
-        printf("Valor inválido!\n");
-        return;
-    }
-
-    if (valor > saldo_real) {
-        printf("Saldo insuficiente!\n");
-        return;
-    }
-
-    saldo_real -= valor;
-    
-    if (num_transacoes < MAX_EXTRATO) {
-        Transacao t;
-        strcpy(t.data_hora, data_hora);
-        strcpy(t.sinal, "-");
-        strcpy(t.moeda, "REAL");
-        t.valor = valor;
-        t.cotacao = 1.0;
-        t.taxa = 0.0;
-        t.saldo_real = saldo_real;
-        t.saldo_bitcoin = saldo_bitcoin;
-        t.saldo_ethe = saldo_ethe;
-        t.saldo_ripple = saldo_ripple;
-        
-        extrato[num_transacoes++] = t;
-    }
-    
-    printf("Saque realizado! Novo saldo: R$%.2f\n", saldo_real);
-    gravar_dados();
-}
-
-void comprar_cripto() {
-    int senha_usuario;
-    printf("Por favor, informe a sua senha: ");
-    scanf("%d", &senha_usuario);
-    
-    if (senha_usuario != senha) {
-        printf("Senha inválida!\n");
-        return;
-    }
-
-    char data_hora[20], moeda[20];
-    float valor_reais;
-    
-    printf("\nCotações Atuais:\n");
-    printf("1. Bitcoin (BTC): R$%.2f\n", cotacao_bit);
-    printf("2. Ethereum (ETH): R$%.2f\n", cotacao_ethe);
-    printf("3. Ripple (XRP): R$%.2f\n", cotacao_ripple);
-    
-    obter_data_hora_atual(data_hora);
-    printf("Escolha a criptomoeda (BTC/ETH/XRP): ");
-    scanf("%s", moeda);
-    printf("Valor em reais para compra: R$");
-    scanf("%f", &valor_reais);
-    
-    if (valor_reais <= 0) {
-        printf("Valor inválido!\n");
-        return;
-    }
-
-    if (valor_reais > saldo_real) {
-        printf("Saldo insuficiente em reais!\n");
-        return;
-    }
-
-    // Converte para uppercase
-    for (int i = 0; moeda[i]; i++) {
-        moeda[i] = toupper(moeda[i]);
-    }
-
-    if (strcmp(moeda, "BTC") == 0) {
-        float taxa = 0.02; // 2%
-        float quantidade = (valor_reais / cotacao_bit) * (1 - taxa);
-        
-        saldo_real -= valor_reais;
-        saldo_bitcoin += quantidade;
-        
-        if (num_transacoes < MAX_EXTRATO) {
-            Transacao t;
-            strcpy(t.data_hora, data_hora);
-            strcpy(t.sinal, "+");
-            strcpy(t.moeda, "BTC");
-            t.valor = quantidade;
-            t.cotacao = cotacao_bit;
-            t.taxa = taxa;
-            t.saldo_real = saldo_real;
-            t.saldo_bitcoin = saldo_bitcoin;
-            t.saldo_ethe = saldo_ethe;
-            t.saldo_ripple = saldo_ripple;
-            
-            extrato[num_transacoes++] = t;
+        switch (op) {
+            case 1: consultarSaldo(cpf); break;
+            case 2: consultarExtrato(cpf); break;
+            case 3: depositar(cpf); break;
+            case 4: sacar(cpf); break;
+            case 5: comprarCripto(cpf); break;
+            case 6: venderCripto(cpf); break;
+            case 7: atualizarCotacoes(); break;
         }
-        
-        printf("Compra realizada! Você adquiriu %.6f BTC\n", quantidade);
-    }
-    else if (strcmp(moeda, "ETH") == 0) {
-        float taxa = 0.01; // 1%
-        float quantidade = (valor_reais / cotacao_ethe) * (1 - taxa);
-        
-        saldo_real -= valor_reais;
-        saldo_ethe += quantidade;
-        
-        if (num_transacoes < MAX_EXTRATO) {
-            Transacao t;
-            strcpy(t.data_hora, data_hora);
-            strcpy(t.sinal, "+");
-            strcpy(t.moeda, "ETH");
-            t.valor = quantidade;
-            t.cotacao = cotacao_ethe;
-            t.taxa = taxa;
-            t.saldo_real = saldo_real;
-            t.saldo_bitcoin = saldo_bitcoin;
-            t.saldo_ethe = saldo_ethe;
-            t.saldo_ripple = saldo_ripple;
-            
-            extrato[num_transacoes++] = t;
+    } while (op != 0);
+}
+
+void menuAdmin() {
+    int op;
+    do {
+        printf("\n--- MENU ADMIN ---\n");
+        printf("1. Cadastrar Investidor\n");
+        printf("2. Excluir Investidor\n");
+        printf("3. Cadastrar Criptomoeda\n");
+        printf("4. Excluir Criptomoeda\n");
+        printf("5. Consultar Saldo de Investidor\n");
+        printf("6. Consultar Extrato de Investidor\n");
+        printf("7. Atualizar Cotações\n");
+        printf("0. Sair\n");
+        printf("Escolha: ");
+        scanf("%d", &op);
+        getchar();
+
+        switch (op) {
+            case 1: cadastrarInvestidor(); break;
+            case 2: excluirInvestidor(); break;
+            case 3: cadastrarCriptomoeda(); break;
+            case 4: excluirCriptomoeda(); break;
+            case 5: consultarSaldoInvestidor(); break;
+            case 6: consultarExtratoInvestidor(); break;
+            case 7: atualizarCotacoes(); break;
         }
-        
-        printf("Compra realizada! Você adquiriu %.4f ETH\n", quantidade);
-    }
-    else if (strcmp(moeda, "XRP") == 0) {
-        float taxa = 0.01; // 1%
-        float quantidade = (valor_reais / cotacao_ripple) * (1 - taxa);
-        
-        saldo_real -= valor_reais;
-        saldo_ripple += quantidade;
-        
-        if (num_transacoes < MAX_EXTRATO) {
-            Transacao t;
-            strcpy(t.data_hora, data_hora);
-            strcpy(t.sinal, "+");
-            strcpy(t.moeda, "XRP");
-            t.valor = quantidade;
-            t.cotacao = cotacao_ripple;
-            t.taxa = taxa;
-            t.saldo_real = saldo_real;
-            t.saldo_bitcoin = saldo_bitcoin;
-            t.saldo_ethe = saldo_ethe;
-            t.saldo_ripple = saldo_ripple;
-            
-            extrato[num_transacoes++] = t;
-        }
-        
-        printf("Compra realizada! Você adquiriu %.2f XRP\n", quantidade);
-    }
-    else {
-        printf("Criptomoeda inválida!\n");
-        return;
-    }
-    
-    gravar_dados();
+    } while (op != 0);
 }
 
-void vender_cripto() {
-    int senha_usuario;
-    printf("Por favor, informe a sua senha: ");
-    scanf("%d", &senha_usuario);
-    
-    if (senha_usuario != senha) {
-        printf("Senha inválida!\n");
-        return;
-    }
-
-    char data_hora[20], moeda[20];
-    float quantidade;
-    
-    printf("\nCotações Atuais:\n");
-    printf("1. Bitcoin (BTC): R$%.2f\n", cotacao_bit);
-    printf("2. Ethereum (ETH): R$%.2f\n", cotacao_ethe);
-    printf("3. Ripple (XRP): R$%.2f\n", cotacao_ripple);
-    
-    obter_data_hora_atual(data_hora);
-    printf("Escolha a criptomoeda (BTC/ETH/XRP): ");
-    scanf("%s", moeda);
-    printf("Quantidade para vender: ");
-    scanf("%f", &quantidade);
-    
-    if (quantidade <= 0) {
-        printf("Quantidade inválida!\n");
-        return;
-    }
-
-    // Converte para uppercase
-    for (int i = 0; moeda[i]; i++) {
-        moeda[i] = toupper(moeda[i]);
-    }
-
-    if (strcmp(moeda, "BTC") == 0) {
-        if (quantidade > saldo_bitcoin) {
-            printf("Saldo insuficiente de Bitcoin!\n");
-            return;
-        }
-        
-        float taxa = 0.03; // 3%
-        float valor_recebido = quantidade * cotacao_bit * (1 - taxa);
-        
-        saldo_bitcoin -= quantidade;
-        saldo_real += valor_recebido;
-        
-        if (num_transacoes < MAX_EXTRATO) {
-            Transacao t;
-            strcpy(t.data_hora, data_hora);
-            strcpy(t.sinal, "-");
-            strcpy(t.moeda, "BTC");
-            t.valor = quantidade;
-            t.cotacao = cotacao_bit;
-            t.taxa = taxa;
-            t.saldo_real = saldo_real;
-            t.saldo_bitcoin = saldo_bitcoin;
-            t.saldo_ethe = saldo_ethe;
-            t.saldo_ripple = saldo_ripple;
-            
-            extrato[num_transacoes++] = t;
-        }
-        
-        printf("Venda realizada! Você recebeu R$%.2f\n", valor_recebido);
-    }
-    else if (strcmp(moeda, "ETH") == 0) {
-        if (quantidade > saldo_ethe) {
-            printf("Saldo insuficiente de Ethereum!\n");
-            return;
-        }
-        
-        float taxa = 0.02; // 2%
-        float valor_recebido = quantidade * cotacao_ethe * (1 - taxa);
-        
-        saldo_ethe -= quantidade;
-        saldo_real += valor_recebido;
-        
-        if (num_transacoes < MAX_EXTRATO) {
-            Transacao t;
-            strcpy(t.data_hora, data_hora);
-            strcpy(t.sinal, "-");
-            strcpy(t.moeda, "ETH");
-            t.valor = quantidade;
-            t.cotacao = cotacao_ethe;
-            t.taxa = taxa;
-            t.saldo_real = saldo_real;
-            t.saldo_bitcoin = saldo_bitcoin;
-            t.saldo_ethe = saldo_ethe;
-            t.saldo_ripple = saldo_ripple;
-            
-            extrato[num_transacoes++] = t;
-        }
-        
-        printf("Venda realizada! Você recebeu R$%.2f\n", valor_recebido);
-    }
-    else if (strcmp(moeda, "XRP") == 0) {
-        if (quantidade > saldo_ripple) {
-            printf("Saldo insuficiente de Ripple!\n");
-            return;
-        }
-        
-        float taxa = 0.01; // 1%
-        float valor_recebido = quantidade * cotacao_ripple * (1 - taxa);
-        
-        saldo_ripple -= quantidade;
-        saldo_real += valor_recebido;
-        
-        if (num_transacoes < MAX_EXTRATO) {
-            Transacao t;
-            strcpy(t.data_hora, data_hora);
-            strcpy(t.sinal, "-");
-            strcpy(t.moeda, "XRP");
-            t.valor = quantidade;
-            t.cotacao = cotacao_ripple;
-            t.taxa = taxa;
-            t.saldo_real = saldo_real;
-            t.saldo_bitcoin = saldo_bitcoin;
-            t.saldo_ethe = saldo_ethe;
-            t.saldo_ripple = saldo_ripple;
-            
-            extrato[num_transacoes++] = t;
-        }
-        
-        printf("Venda realizada! Você recebeu R$%.2f\n", valor_recebido);
-    }
-    else {
-        printf("Criptomoeda inválida!\n");
-        return;
-    }
-    
-    gravar_dados();
+// Funções principais (implementações básicas de cada uma)
+void consultarSaldo(char *cpf) {
+    // Carrega investidor e mostra saldos
+    printf(">>> Consultar saldo - Em desenvolvimento\n");
 }
 
-void atualizar_cot() {
-    int variacao_max = 5; // Variação máxima de 5%
-    
-    // Atualiza Bitcoin
-    int variacao = rand() % (2 * variacao_max + 1) - variacao_max;
-    cotacao_bit *= 1 + variacao / 100.0;
-    
-    // Atualiza Ethereum
-    variacao = rand() % (2 * variacao_max + 1) - variacao_max;
-    cotacao_ethe *= 1 + variacao / 100.0;
-    
-    // Atualiza Ripple
-    variacao = rand() % (2 * variacao_max + 1) - variacao_max;
-    cotacao_ripple *= 1 + variacao / 100.0;
-    
-    printf("\nCotações atualizadas com sucesso!\n");
-    printf("Novos valores:\n");
-    printf("Bitcoin: R$%.2f\n", cotacao_bit);
-    printf("Ethereum: R$%.2f\n", cotacao_ethe);
-    printf("Ripple: R$%.2f\n\n", cotacao_ripple);
-    
-    gravar_dados();
+void consultarExtrato(char *cpf) {
+    // Lê arquivo extrato_cpf.txt
+    printf(">>> Consultar extrato - Em desenvolvimento\n");
 }
 
-void menu() {
-    printf("\n=== Menu Principal ===\n");
-    printf("1. Consultar Saldos\n");
-    printf("2. Consultar Extrato\n");
-    printf("3. Realizar Depósito\n");
-    printf("4. Realizar Saque\n");
-    printf("5. Comprar Criptomoedas\n");
-    printf("6. Vender Criptomoedas\n");
-    printf("7. Atualizar Cotações\n");
-    printf("0. Sair\n");
-    printf("======================\n");
+void depositar(char *cpf) {
+    printf(">>> Depositar - Em desenvolvimento\n");
 }
 
-bool voltar() {
-    char opcao[5];
-    printf("\nDeseja voltar ao menu principal? (s/n): ");
-    scanf("%s", opcao);
-    
-    if (tolower(opcao[0]) == 'n') {
-        printf("Encerrando sessão...\n");
-        return true;
+void sacar(char *cpf) {
+    printf(">>> Sacar - Em desenvolvimento\n");
+}
+
+void comprarCripto(char *cpf) {
+    printf(">>> Comprar Cripto - Em desenvolvimento\n");
+}
+
+void venderCripto(char *cpf) {
+    printf(">>> Vender Cripto - Em desenvolvimento\n");
+}
+
+void atualizarCotacoes() {
+    srand(time(NULL));
+    for (int i = 0; i < totalCriptos; i++) {
+        float variacao = ((rand() % 1001) / 10000.0f) * ((rand() % 2) ? 1 : -1);
+        criptos[i].cotacao += criptos[i].cotacao * variacao;
+        printf("Nova cotação %s: R$ %.2f\n", criptos[i].nome, criptos[i].cotacao);
     }
-    return false;
 }
 
-void cadastrar_investidor() {
-    char nome[50], cpf[15];
-    int senha;
-    printf("Nome do investidor: ");
-    scanf(" %[^\n]", nome);
-    printf("CPF: ");
-    scanf("%s", cpf);
-    printf("Senha: ");
-    scanf("%d", &senha);
-    printf("Investidor %s com CPF %s cadastrado com sucesso!\n", nome, cpf);
+// ADMIN
+void cadastrarInvestidor() {
+    printf(">>> Cadastrar investidor - Em desenvolvimento\n");
 }
 
-void excluir_investidor() {
-    char cpf[15];
-    printf("CPF do investidor a ser excluído: ");
-    scanf("%s", cpf);
-    printf("Investidor com CPF %s excluído com sucesso!\n", cpf);
+void excluirInvestidor() {
+    printf(">>> Excluir investidor - Em desenvolvimento\n");
 }
 
-void consultar_saldo_investidor() {
-    char cpf[15];
-    printf("Informe o CPF do investidor: ");
-    scanf("%s", cpf);
-    printf("Saldo do investidor %s consultado (simulado).\n", cpf);
+void cadastrarCriptomoeda() {
+    printf(">>> Cadastrar criptomoeda - Em desenvolvimento\n");
 }
 
-void consultar_extrato_investidor() {
-    char cpf[15];
-    printf("Informe o CPF do investidor: ");
-    scanf("%s", cpf);
-    printf("Extrato do investidor %s consultado (simulado).\n", cpf);
+void excluirCriptomoeda() {
+    printf(">>> Excluir criptomoeda - Em desenvolvimento\n");
 }
 
-void menu_administrador() {
-    printf("\n=== Menu Administrador ===\n");
-    printf("1. Cadastrar Investidor\n");
-    printf("2. Excluir Investidor\n");
-    printf("3. Cadastrar Criptomoeda\n");
-    printf("4. Excluir Criptomoeda\n");
-    printf("5. Consultar Saldo de Investidor\n");
-    printf("6. Consultar Extrato de Investidor\n");
-    printf("7. Atualizar Cotação de Criptomoedas\n");
-    printf("0. Sair\n");
-    printf("==========================\n");
+void consultarSaldoInvestidor() {
+    printf(">>> Consultar saldo de investidor - Em desenvolvimento\n");
+}
+
+void consultarExtratoInvestidor() {
+    printf(">>> Consultar extrato de investidor - Em desenvolvimento\n");
 }

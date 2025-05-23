@@ -1,79 +1,45 @@
 #ifndef FUNCOES_H
 #define FUNCOES_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
-#include <stdbool.h>
-
-#define MAX_EXTRATO 100
-#define MAX_LINHA 256
-#define MAX_USUARIOS 100
-#define MAX_CRIPTOS 100
-
+// Estruturas
 typedef struct {
-    char data_hora[50];
-    char sinal[2];
-    char moeda[10];
-    float valor;
-    float cotacao;
-    float taxa;
-    float saldo_real;
-    float saldo_bitcoin;
-    float saldo_ethe;
-    float saldo_ripple;
-} Transacao;
-
-typedef struct {
-    char nome[50];
+    char nome[100];
     char cpf[15];
-    int senha;
-    float saldo_real;
-    float saldo_bitcoin;
-    float saldo_ethe;
-    float saldo_ripple;
+    char senha[20];
+    float saldoReais;
+    float saldoBTC;
+    float saldoETH;
+    float saldoXRP;
 } Investidor;
 
 typedef struct {
-    char nome[30];
+    char nome[20];
     float cotacao;
-    float taxa_compra;
-    float taxa_venda;
+    float taxaCompra;
+    float taxaVenda;
 } Criptomoeda;
 
-extern char nome[50];
-extern char cpf[15];
-extern int senha;
-extern float saldo_real;
-extern float saldo_bitcoin;
-extern float saldo_ethe;
-extern float saldo_ripple;
-extern float cotacao_bit;
-extern float cotacao_ethe;
-extern float cotacao_ripple;
-extern Transacao extrato[MAX_EXTRATO];
-extern int num_transacoes;
+// Funções do sistema
+int loginInvestidor(char *cpf, char *senha);
+int loginAdmin(char *cpf, char *senha);
 
-void obter_data_hora_atual(char *data_hora);
-void ler_arquivo();
-void gravar_dados();
-void consultar_saldo();
-void consultar_extrato();
-void depositar();
-void sacar();
-void comprar_cripto();
-void vender_cripto();
-void atualizar_cot();
-void menu();
-bool voltar();
+// Investidor
+void menuInvestidor(char *cpf);
+void consultarSaldo(char *cpf);
+void consultarExtrato(char *cpf);
+void depositar(char *cpf);
+void sacar(char *cpf);
+void comprarCripto(char *cpf);
+void venderCripto(char *cpf);
+void atualizarCotacoes();
 
-void menu_administrador();
-void cadastrar_investidor();
-void excluir_investidor();
-void cadastrar_cripto();
-void excluir_cripto();
-void consultar_saldo_investidor();
-void consultar_extrato_investidor();
+// Admin
+void menuAdmin();
+void cadastrarInvestidor();
+void excluirInvestidor();
+void cadastrarCriptomoeda();
+void excluirCriptomoeda();
+void consultarSaldoInvestidor();
+void consultarExtratoInvestidor();
 
 #endif
