@@ -1,8 +1,11 @@
-# PROJETO 02
+# PROJETO 04
 Projeto Crypto
  
 # OBJETIVO DO PROJETO
 O objetivo do projeto é desenvolver uma Exchange de Criptomoedas, onde o usuário poderá realizar operações de saque e depósito em reais, compra e venda de criptoativos, consulta de saldo e extratos, além da atualização das cotações dessas criptomoedas.
+
+Além do modo usuário, o sistema também conta com um modo administrador, que permite ao responsável da plataforma acessar funcionalidades exclusivas, como visualizar os saldos de todos os usuários, redefinir valores de saldos e cotações, e realizar manutenção nos dados registrados no sistema. Esse modo é protegido por um login específico e separado do acesso comum de usuário.
+
 
 # FORMA DE COMPILAÇÃO E EXECUÇÃO
 Inicialização   
@@ -31,9 +34,23 @@ Persistência dos Dados
         Abrir dados.txt em modo escrita ("w").
         Salvar todos os saldos e cotações.
         Escrever cada transação do extrato no formato:
-            DATA HORA | TIPO | VALOR | MOEDA | COTAÇÃO | TAXA | SALDO_ATUAL
+        DATA HORA | TIPO | VALOR | MOEDA | COTAÇÃO | TAXA | SALDO_ATUAL
 Saída
     Ao escolher "Sair", gravar_dados() é chamada uma última vez para garantir que nada seja perdido.
+
+Funções Administrativas (acesso exclusivo)
+    O administrador, ao fazer login, pode visualizar todos os saldos, resetar dados, e gerenciar cotação inicial das moedas, conforme implementado nas funções do modo admin.
+
+Persistência dos Dados
+    Sempre que uma função altera saldos ou extrato, gravar_dados() é chamada para:
+    Abrir dados.txt em modo escrita ("w").
+    Salvar todos os saldos e cotações.
+    Escrever cada transação do extrato no formato:
+    DATA HORA | TIPO | VALOR | MOEDA | COTAÇÃO | TAXA | SALDO_ATUAL
+
+Saída
+    Ao escolher "Sair", gravar_dados() é chamada uma última vez para garantir que nada seja perdido.
+
 
 # BREVE EXPLICAÇÃO SOBRE A FORMA DE USO DO PROGRAMA
 Para usar o programa, primeiro faça login com o CPF e senha. Após acessar, você verá um menu com 8 opções:
@@ -48,6 +65,18 @@ Para usar o programa, primeiro faça login com o CPF e senha. Após acessar, voc
 0. Sair - Encerra o programa e salva automaticamente todos os seus dados.
 
 Todas as suas transações ficam guardadas no arquivo dados.txt na mesma pasta do programa.
+
+Modo Administrativo
+Ao acessar o sistema com o login de administrador, será exibido um menu exclusivo com opções voltadas à gestão da plataforma. Entre as funções disponíveis estão:
+
+Visualizar todos os saldos - Permite consultar os saldos de BRL, BTC, ETH e XRP de todos os usuários registrados.
+
+Resetar dados - Restaura os valores de saldos e cotações para os padrões iniciais, útil em testes ou manutenção do sistema.
+
+Gerenciar cotações - Possibilita alterar manualmente o valor de mercado de cada criptomoeda (BTC, ETH e XRP), sem depender da atualização aleatória.
+
+Essas funções são protegidas e separadas do menu do usuário comum, garantindo a segurança e integridade das informações do sistema.
+
 
 # LISTA COM NOMES E MATRÍCULAS DOS PARTICIPANTES DO GRUPO
 Lucas Belo Gaspardo - RA: 22.224.007-9
