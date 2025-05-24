@@ -1,9 +1,0 @@
-Saldo em Real: 0.00
-Saldo em Bitcoin: 0.000000
-Saldo em Ethereum: 0.0000
-Saldo em Ripple: 0.00
-Cotação Bitcoin: R$416328.72
-Cotação Ethereum: R$15201.58
-Cotação Ripple: R$2.99
-
-Extrato de Transações:

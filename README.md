@@ -8,75 +8,80 @@ Além do modo usuário, o sistema também conta com um modo administrador, que p
 
 
 # FORMA DE COMPILAÇÃO E EXECUÇÃO
-Inicialização   
-    Ao executar, o programa chama ler_arquivo() para carregar os dados do arquivo dados.txt (saldo, extrato e cotações).
-    Se o arquivo não existir, gravar_dados() cria um novo com valores padrão.
-Login
-    O usuário digita CPF e senha, que são comparados com as variáveis globais cpf e senha.
-    Se corretos, o menu principal é exibido.
-Menu Principal (Loop Principal)
-    O switch no main.c direciona para cada função conforme a opção digitada:
-    Depositar/Sacar (depositar(), sacar())
-        Obtém a data/hora atual com obter_data_hora_atual().
-        Atualiza saldo_real (+ para depósito, - para saque).
-        Registra a transação no array extrato.
-        Chama gravar_dados() para salvar no arquivo.
-    Comprar/Vender Cripto (comprar_cripto(), vender_cripto())
-        Mostra as cotações atuais (variáveis cotacao_bit, cotacao_ethe, etc.).
-        Calcula o valor com taxas (ex: 2% para comprar BTC).
-        Atualiza os saldos (ex: diminui saldo_real e aumenta saldo_bitcoin).
-        Registra no extrato e chama gravar_dados().
-    Atualizar Cotações (atualizar_cot())
-        Gera variações aleatórias (entre -5% e +5%) para cotacao_bit, cotacao_ethe, etc.
-        Atualiza o arquivo com gravar_dados().
-Persistência dos Dados
-    Sempre que uma função altera saldos ou extrato, gravar_dados() é chamada para:
-        Abrir dados.txt em modo escrita ("w").
-        Salvar todos os saldos e cotações.
-        Escrever cada transação do extrato no formato:
-        DATA HORA | TIPO | VALOR | MOEDA | COTAÇÃO | TAXA | SALDO_ATUAL
-Saída
-    Ao escolher "Sair", gravar_dados() é chamada uma última vez para garantir que nada seja perdido.
+Inicialização:
+O sistema inicia com valores padrão para as criptomoedas:
+Bitcoin: R$ 200.000,00 (taxa 1%)
+Ethereum: R$ 10.000,00 (taxa 0.8%)
+Ripple: R$ 2,00 (taxa 0.5%)
+Não há persistência entre execuções (dados ficam apenas em memória)
 
-Funções Administrativas (acesso exclusivo)
-    O administrador, ao fazer login, pode visualizar todos os saldos, resetar dados, e gerenciar cotação inicial das moedas, conforme implementado nas funções do modo admin.
+Login:
+Investidores: CPF e senha cadastrados (ex: "12345678901"/"senha123")
+Administrador: senha fixa "admin123"
 
-Persistência dos Dados
-    Sempre que uma função altera saldos ou extrato, gravar_dados() é chamada para:
-    Abrir dados.txt em modo escrita ("w").
-    Salvar todos os saldos e cotações.
-    Escrever cada transação do extrato no formato:
-    DATA HORA | TIPO | VALOR | MOEDA | COTAÇÃO | TAXA | SALDO_ATUAL
+Fluxo Principal:
+O usuário faz login com CPF e senha
+O sistema verifica as credenciais
+Se válidas, mostra o menu correspondente (investidor ou admin)
+Cada operação é processada e registrada
 
-Saída
-    Ao escolher "Sair", gravar_dados() é chamada uma última vez para garantir que nada seja perdido.
-
+Extratos são salvos em "extrato.txt"
 
 # BREVE EXPLICAÇÃO SOBRE A FORMA DE USO DO PROGRAMA
-Para usar o programa, primeiro faça login com o CPF e senha. Após acessar, você verá um menu com 8 opções:
+Para Investidores:
+    Consultar Saldo - Mostra os valores atuais em:
+        Reais (BRL)
+        Bitcoin (BTC)
+        Ethereum (ETH)
+        Ripple (XRP)
 
-1. Consultar Saldo - Mostra quanto você tem em Real (BRL), Bitcoin (BTC), Ethereum (ETH) e Ripple (XRP), com os valores convertidos para BRL.
-2. Ver Extrato - Exibe todo o histórico de transações, incluindo depósitos, saques, compras e vendas de criptomoedas, com data/hora, valores e saldos atualizados.
-3. Depositar Dinheiro - Permite adicionar mais dinheiro em BRL à sua conta. Basta digitar o valor desejado.
-4. Sacar Dinheiro - Retira um valor em BRL da sua conta, desde que você tenha saldo suficiente.
-5. Comprar Criptomoedas - Aqui você pode converter seu BRL em Bitcoin (com taxa de 2%), Ethereum (taxa 1%) ou Ripple (taxa 1%). Digite o valor em BRL que quer investir.
-6. Vender Criptomoedas - Venda suas criptomoedas para receber BRL: Bitcoin tem taxa de 3%, Ethereum 2% e Ripple 1%. Escolha a moeda e a quantidade.
-7. Atualizar Cotações - Atualiza os preços das criptomoedas com variações aleatórias de até 5% para simular o mercado real.
-0. Sair - Encerra o programa e salva automaticamente todos os seus dados.
+    Consultar Extrato - Exibe o histórico completo com:
+        Data e hora exatas
+        Tipo de operação
+        Valores e taxas aplicadas
+        Saldo após cada transação
 
-Todas as suas transações ficam guardadas no arquivo dados.txt na mesma pasta do programa.
+    Depositar Dinheiro - Adiciona valores à conta em BRL:
+        Digite o valor desejado
+        Confirmação automática
 
-Modo Administrativo
-Ao acessar o sistema com o login de administrador, será exibido um menu exclusivo com opções voltadas à gestão da plataforma. Entre as funções disponíveis estão:
+    Sacar Dinheiro - Retira valores da conta:
+        Exige confirmação de senha
+        Bloqueia se saldo for insuficiente
 
-Visualizar todos os saldos - Permite consultar os saldos de BRL, BTC, ETH e XRP de todos os usuários registrados.
+    Comprar Criptomoedas - Conversão de BRL para criptos:
+        Mostra cotações atualizadas
+        Calcula taxas automaticamente
+        Confirmação antes da execução
 
-Resetar dados - Restaura os valores de saldos e cotações para os padrões iniciais, útil em testes ou manutenção do sistema.
+    Vender Criptomoedas - Conversão de criptos para BRL:
+        Exibe valor líquido após taxas
+        Requer confirmação dupla
 
-Gerenciar cotações - Possibilita alterar manualmente o valor de mercado de cada criptomoeda (BTC, ETH e XRP), sem depender da atualização aleatória.
+    Atualizar Cotações - Simula variações de mercado:
+        Oscilações entre -5% e +5%
+        Atualização em tempo real
 
-Essas funções são protegidas e separadas do menu do usuário comum, garantindo a segurança e integridade das informações do sistema.
+Para Administradores:
+Acesso exclusivo com a senha "admin123", contendo ferramentas para:
+    Cadastrar Investidor - Registra novos usuários com:
+        Nome completo
+        CPF (apenas números)
+        Senha de acesso
 
+    Excluir Investidor - Remove cadastros por CPF:
+        Mostra dados antes de confirmar
+        Exclusão definitiva
+
+    Gerenciar Criptomoedas - Adiciona/remove ativos:
+        Define nome e símbolo
+        Configura cotação inicial
+        Ajusta taxas de compra/venda
+
+    Consultas Avançadas - Acesso completo a:
+        Saldos de qualquer investidor
+        Extratos detalhados por CPF
+        Atualização Forçada - Modifica cotações manualmente
 
 # LISTA COM NOMES E MATRÍCULAS DOS PARTICIPANTES DO GRUPO
 Lucas Belo Gaspardo - RA: 22.224.007-9

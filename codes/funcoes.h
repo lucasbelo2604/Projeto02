@@ -1,45 +1,64 @@
 #ifndef FUNCOES_H
 #define FUNCOES_H
 
-// Estruturas
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include <ctype.h>
+
+#define MAX_INVESTIDORES 100
+#define MAX_CRIPTOMOEDAS 10
+#define MAX_TRANSACOES 1000
+
 typedef struct {
-    char nome[100];
-    char cpf[15];
+    char nome[50];
+    char cpf[12];
     char senha[20];
-    float saldoReais;
-    float saldoBTC;
-    float saldoETH;
-    float saldoXRP;
+    float saldo_reais;
+    float saldo_bitcoin;
+    float saldo_ethereum;
+    float saldo_ripple;
 } Investidor;
 
 typedef struct {
-    char nome[20];
+    char nome[50];
     float cotacao;
-    float taxaCompra;
-    float taxaVenda;
+    float taxa_compra;
+    float taxa_venda;
 } Criptomoeda;
 
-// Funções do sistema
-int loginInvestidor(char *cpf, char *senha);
-int loginAdmin(char *cpf, char *senha);
+typedef struct {
+    char cpf[12];
+    char tipo[20]; // "DEPOSITO", "SAQUE", "COMPRA", "VENDA"
+    float valor;
+    float taxa;
+    char data[20];
+    char criptomoeda[20]; // Apenas para compra/venda
+} Transacao;
 
-// Investidor
-void menuInvestidor(char *cpf);
-void consultarSaldo(char *cpf);
-void consultarExtrato(char *cpf);
-void depositar(char *cpf);
-void sacar(char *cpf);
-void comprarCripto(char *cpf);
-void venderCripto(char *cpf);
-void atualizarCotacoes();
+// Funções para investidor
+int loginInvestidor(Investidor investidores[], int numInvestidores, char cpf[], char senha[]);
+void consultarSaldo(Investidor investidor);
+void consultarExtrato(Transacao transacoes[], int numTransacoes, char cpf[]);
+void depositarReais(Investidor *investidor, Transacao transacoes[], int *numTransacoes);
+void sacarReais(Investidor *investidor, Transacao transacoes[], int *numTransacoes, char senha[]);
+void comprarCriptomoedas(Investidor *investidor, Criptomoeda criptomoedas[], int numCriptomoedas, Transacao transacoes[], int *numTransacoes, char senha[]);
+void venderCriptomoedas(Investidor *investidor, Criptomoeda criptomoedas[], int numCriptomoedas, Transacao transacoes[], int *numTransacoes, char senha[]);
+void atualizarCotacoes(Criptomoeda criptomoedas[], int numCriptomoedas);
 
-// Admin
-void menuAdmin();
-void cadastrarInvestidor();
-void excluirInvestidor();
-void cadastrarCriptomoeda();
-void excluirCriptomoeda();
-void consultarSaldoInvestidor();
-void consultarExtratoInvestidor();
+// Funções para administrador
+int loginAdmin(char senha[]);
+void cadastrarInvestidor(Investidor investidores[], int *numInvestidores);
+void excluirInvestidor(Investidor investidores[], int *numInvestidores);
+void cadastrarCriptomoeda(Criptomoeda criptomoedas[], int *numCriptomoedas);
+void excluirCriptomoeda(Criptomoeda criptomoedas[], int *numCriptomoedas);
+void consultarSaldoInvestidor(Investidor investidores[], int numInvestidores);
+void consultarExtratoInvestidor(Transacao transacoes[], int numTransacoes);
+void atualizarCotacoesAdmin(Criptomoeda criptomoedas[], int numCriptomoedas);
+
+// Funções auxiliares
+void gerarData(char data[]);
+void salvarTransacao(Transacao transacoes[], int *numTransacoes, char cpf[], char tipo[], float valor, float taxa, char criptomoeda[]);
 
 #endif
